@@ -45,3 +45,7 @@ export interface MovieItemProps {
     size: {width: number; height: number}
     coverType: 'poster' | 'backdrop'
 }
+
+export interface MovieDetailProps {
+    movie: Movie
+}
