@@ -14,6 +14,7 @@ import MovieList from '../components/MovieList'
 
 const MovieDetail = ({ route }: any): JSX.Element => {
     const [detailMovie, setDetailMovie] = useState<Movie | null>(null)
+    const [isFavorite, setIsFavorite] = useState<boolean>(false)
     const { id } = route.params
 
     useEffect(() => {
@@ -67,6 +68,14 @@ const MovieDetail = ({ route }: any): JSX.Element => {
                         <Text style={styles.rating}>
                             {detailMovie.vote_average.toFixed(1)}
                         </Text>
+                    </View>
+                    <View style={styles.favoriteContainer}>
+                        <FontAwesome
+                            name={isFavorite ? 'heart' : 'heart-o'} // Ubah ikon berdasarkan status isFavorite
+                            size={24}
+                            color="pink"
+                            onPress={() => setIsFavorite(!isFavorite)} // Toggle status isFavorite
+                        />
                     </View>
                 </LinearGradient>
             </ImageBackground>
@@ -171,6 +180,11 @@ const styles = StyleSheet.create({
     },
     gridItemText: {
         fontWeight: '700',
+    },
+    favoriteContainer: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
     },
 })
 
