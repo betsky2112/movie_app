@@ -13,9 +13,12 @@ import { useNavigation, StackActions } from '@react-navigation/native'
 
 const MovieItem = ({ movie, size, coverType }: MovieItemProps): JSX.Element => {
     const navigation = useNavigation()
-    const pushNavigation = StackActions.push('MovieDetail', { id: movie.id })
+    const pushNavigation = () => {
+        navigation.dispatch(StackActions.push('MovieDetail', { id: movie.id }))
+    }
+
     return (
-        <TouchableOpacity onPress={() => navigation.dispatch(pushNavigation)}>
+        <TouchableOpacity onPress={pushNavigation}>
             <ImageBackground
                 resizeMode="cover"
                 style={[size, styles.backgroundImage]}

@@ -11,6 +11,7 @@ import { FontAwesome } from '@expo/vector-icons'
 import { Movie } from '../types/app'
 import { LinearGradient } from 'expo-linear-gradient'
 import MovieList from '../components/MovieList'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const MovieDetail = ({ route }: any): JSX.Element => {
     const [detailMovie, setDetailMovie] = useState<Movie | null>(null)
@@ -19,7 +20,8 @@ const MovieDetail = ({ route }: any): JSX.Element => {
 
     useEffect(() => {
         getMovieDetail()
-    }, [])
+        checkIsFavorite(id).then(setIsFavorite)
+    }, [id])
 
     const getMovieDetail = (): void => {
         const url = `https://api.themoviedb.org/3/movie/${id}?language=en-US`
@@ -41,12 +43,72 @@ const MovieDetail = ({ route }: any): JSX.Element => {
             })
     }
 
+    const checkIsFavorite = async (id: number): Promise<boolean> => {
+        try {
+            const initialData: string | null =
+                await AsyncStorage.getItem('@FavoriteList')
+            if (initialData !== null) {
+                const favMovieList: Movie[] = JSON.parse(initialData)
+                return favMovieList.some((movie) => movie.id === id)
+            }
+            return false
+        } catch (error) {
+            console.log(error)
+            return false
+        }
+    }
+
     if (!detailMovie) {
         return (
             <View style={styles.loadingContainer}>
                 <Text style={styles.loadingText}>Loading...</Text>
             </View>
         )
+    }
+
+    const addFavorite = async (movie: Movie): Promise<void> => {
+        try {
+            const initialData: string | null =
+                await AsyncStorage.getItem('@FavoriteList')
+            let favMovieList: Movie[] = []
+
+            if (initialData !== null) {
+                favMovieList = [...JSON.parse(initialData), movie]
+            } else {
+                favMovieList = [movie]
+            }
+
+            await AsyncStorage.setItem(
+                '@FavoriteList',
+                JSON.stringify(favMovieList),
+            )
+
+            setIsFavorite(true)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const removeFavorite = async (movieId: number): Promise<void> => {
+        try {
+            const initialData: string | null =
+                await AsyncStorage.getItem('@FavoriteList')
+            if (initialData !== null) {
+                const favMovieList: Movie[] = JSON.parse(initialData)
+                const updatedFavMovieList = favMovieList.filter(
+                    (movie) => movie.id !== movieId,
+                )
+
+                await AsyncStorage.setItem(
+                    '@FavoriteList',
+                    JSON.stringify(updatedFavMovieList),
+                )
+
+                setIsFavorite(false)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
@@ -71,10 +133,16 @@ const MovieDetail = ({ route }: any): JSX.Element => {
                     </View>
                     <View style={styles.favoriteContainer}>
                         <FontAwesome
-                            name={isFavorite ? 'heart' : 'heart-o'} // Ubah ikon berdasarkan status isFavorite
+                            name={isFavorite ? 'heart' : 'heart-o'}
                             size={24}
                             color="pink"
-                            onPress={() => setIsFavorite(!isFavorite)} // Toggle status isFavorite
+                            onPress={() => {
+                                if (isFavorite) {
+                                    removeFavorite(detailMovie.id)
+                                } else {
+                                    addFavorite(detailMovie)
+                                }
+                            }}
                         />
                     </View>
                 </LinearGradient>
