@@ -49,3 +49,8 @@ export interface MovieItemProps {
 export interface MovieDetailProps {
     movie: Movie
 }
+
+export interface MovieCategoryProps {
+    id: number
+    name: string
+}
