@@ -52,7 +52,8 @@ const Favorite = (): JSX.Element => {
                             />
                         </TouchableOpacity>
                     )}
-                    numColumns={3} // Menampilkan dalam grid dengan 3 kolom
+                    numColumns={3}
+                    showsVerticalScrollIndicator={false}
                 />
             ) : (
                 <Text style={styles.noFavoriteText}>
